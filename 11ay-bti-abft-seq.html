@@ -2,12 +2,13 @@
 <html>
 <body>
 
-<h2>11ay Initial Access: BTI + A-BFT</h2>
+<h2>11ay Initial Access</h2>
 
+<h3>Method 1: BTI + A-BFT</h3>
 <p> EDMG AP or PCP transmits a sequence of DMG Beacon, then EDMG non-AP STAs will access in A-BFT.</p>
 
 <p>Features: 1, short SSW; 2, EDMG dedicated SSW slot; 3, Beacon+TRN-R</p>
-<svg width="1200" height="480" id="demo2">
+<svg width="1200" height="380" id="demo2">
   <defs>
     <!-- arrowhead marker definition -->
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
@@ -27,6 +28,46 @@
 
 <p> Frame sequence = </p>
 <p id="demo">a</p>
+
+<h3>Method 2: BTI + Unsolicited RSS</h3>
+<p>Features: 1, Unsolicited RSS; </p>
+<svg width="1200" height="180" id="demo3">
+  <defs>
+    <!-- arrowhead marker definition -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+        markerWidth="6" markerHeight="6"
+        orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+
+    <!-- simple dot marker definition -->
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5"
+        markerWidth="5" markerHeight="5">
+      <circle cx="5" cy="5" r="5" fill="red" />
+    </marker>
+  </defs>
+  Sorry, your browser does not support inline SVG.  
+</svg>
+
+<h3>Method 3: BTI + BFT</h3>
+<p>Features: 1, BFT with directional Rx for EDMG AP with sector level reciprocity; </p>
+<svg width="1200" height="180" id="demo4">
+  <defs>
+    <!-- arrowhead marker definition -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+        markerWidth="6" markerHeight="6"
+        orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+
+    <!-- simple dot marker definition -->
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5"
+        markerWidth="5" markerHeight="5">
+      <circle cx="5" cy="5" r="5" fill="red" />
+    </marker>
+  </defs>
+  Sorry, your browser does not support inline SVG.  
+</svg>
 
 <p id="dbg">b</p>
 
@@ -111,7 +152,8 @@ DMGFrame.prototype.plot = function(svgID, x, y) {
 };
 
 var bcnFrame = new Frame("Beacon", 100);
-var sswfbFrame = new Frame("SSW FB", 60);
+var sswfbFrame = new Frame("SSW-FB", 60);
+var sswackFrame = new Frame("SSW-ack", 60);
 var dmgbcnFrame = new DMGFrame("Beacon", 100, "TRN-R", 2);
 
 
@@ -139,6 +181,7 @@ IFS.prototype.plot = function(svgID,x,y) {
     document.getElementById(svgID).appendChild(textElement);
     return new SeqInfo(x + this.width, 0);
 }
+var sIFS = new IFS("SIFS", 20);
 var sbIFS = new IFS("SBIFS", 10);
 var mbIFS = new IFS("MBIFS", 20);
 
@@ -202,6 +245,10 @@ var edmgbtiSeq = new Sequence([dmgbcnFrame,sbIFS,dmgbcnFrame,sbIFS,dmgbcnFrame,m
 var dmgsswslotSeq = new Sequence([sswSlot,sbIFS,sswSlot,mbIFS,sswfbFrame,mbIFS], 60, "SSW slot");
 var edmgsswslotSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,sswfbFrame,mbIFS], 60, "SSW slot");
 
+var edmgUnsolicitedRSSSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,sswfbFrame,sIFS,sswackFrame], 60, "UnsolicitedRSS");
+
+var edmgBFTSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,sswfbFrame], 60, "BFT");
+
 var dmgabftSeq = new Sequence([dmgsswslotSeq,dmgsswslotSeq], 60, "A-BFT");
 var edmgabftSeq = new Sequence([edmgsswslotSeq,edmgsswslotSeq,edmgsswslotSeq], 60, "A-BFT");
 document.getElementById("demo").innerHTML = dmgbtiSeq.printName();
@@ -215,6 +262,15 @@ dmgabftSeq.plot(svgID,seqInfo.x_end,90);
 seqInfo = edmgbtiSeq.plot(svgID,20,290);
 edmgabftSeq.plot(svgID,seqInfo.x_end,290);
 
+svgID="demo3";
+
+seqInfo = dmgbtiSeq.plot(svgID,20,90);
+edmgUnsolicitedRSSSeq.plot(svgID,seqInfo.x_end,90);
+
+svgID="demo4";
+
+seqInfo = dmgbtiSeq.plot(svgID,20,90);
+edmgBFTSeq.plot(svgID,seqInfo.x_end,90);
 </script>
 
 </body>
