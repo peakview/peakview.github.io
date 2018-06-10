@@ -94,7 +94,7 @@ function WrapText(textElement, width) {
     //textElement.textContent="a"+txtLineNew;
       if (txtLineNew.length>NcharPerLine) {
         if (txtLineOld.length == 0) {
-          txtLine = txtLineNew;
+          txtLine = txts[iiWord];
           txtLineOld = "";
         }
         else {
@@ -400,12 +400,12 @@ var suMimoBrpTxssSeq = new Sequence([suSisoSetupSeq,suInitiatorBrpTxssSeq,suResp
 var suMimoSisoPhaseSeq = new Sequence([suMimoBrpTxssSeq], 60, "SU-MIMO SISO Phase");
 if (1) {
   svgID="fig1";
-  seqInfo = suMimoSisoPhaseSeq.plot(svgID,20,120);
+  seqInfo = suMimoSisoPhaseSeq.plot(svgID,20,140);
 }
 var suMimoSisoPhaseSeq = new Sequence([suSisoFeedbackSeq], 60, "SU-MIMO SISO Phase");
 if (1) {
   svgID="fig1";
-  seqInfo = suMimoSisoPhaseSeq.plot(svgID,20,290);
+  seqInfo = suMimoSisoPhaseSeq.plot(svgID,20,310);
 }
   
 var suMimoSetupSeq = new Sequence([mimoBfSetupFrame,sIFS,mimoBfSetupFrame,mbIFS], 60, "Setup Subphase");
