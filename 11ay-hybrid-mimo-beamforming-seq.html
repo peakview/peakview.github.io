@@ -159,7 +159,7 @@ DMGFrame.prototype.plotTail = function(svgID, x, y) {
     rectElement.setAttribute("height", this.height);
     var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
     x_tmp=x + 14;
-    y_tmp = y + this.height/2+25;
+    y_tmp = y + this.height/2+28;
     textElement.setAttribute("x", x_tmp);
     textElement.setAttribute("y", y_tmp);
     textElement.setAttribute("transform", "rotate(-90,"+(x_tmp)+"," + (y_tmp)+")");
@@ -277,19 +277,20 @@ Sequence.prototype.plot = function(svgID,x,y,lanes=0) {
     if (this.name.length >0) {
     var lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
     lineElement.setAttribute("x1", x);
-    lineElement.setAttribute("y1", y - y_space_layer*(layerID+1));
+    lineElement.setAttribute("y1", y - y_space_layer*(layerID+1)-10);
     lineElement.setAttribute("x2", this.x_end);
-    lineElement.setAttribute("y2", y - y_space_layer*(layerID+1));
+    lineElement.setAttribute("y2", y - y_space_layer*(layerID+1)-10);
     lineElement.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
     lineElement.setAttribute("marker-start","url(#arrow)");
     lineElement.setAttribute("marker-end","url(#arrow)");
     var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
     textElement.setAttribute("x", (x + this.x_end)/2);//
-    textElement.setAttribute("y", y - y_space_layer*(layerID+1) - 5);
+    textElement.setAttribute("y", y - y_space_layer*(layerID+1) - 20);
     textElement.setAttribute("text-anchor", "middle");
     textElement.textContent = this.name;//+"("+this.seq.length;
     document.getElementById(svgID).appendChild(lineElement);
     document.getElementById(svgID).appendChild(textElement);
+      WrapText(textElement, this.x_end-x)
     }
     return new SeqInfo(this.x_end, layerID+1);
 }
@@ -440,7 +441,7 @@ if (1) {
   hybridMuMimoSoundingSeq.multiLanes(svgID, 50,120, ["AP","STA1","STA2"]);
 }
   
-var suFeedbackSeq = new Sequence([mimoBfFbFrame], 60, "Feedback Subphase");
+var suFeedbackSeq = new Sequence([mimoBfFbFrame], 60, "Feedback Phase");
 var hybridSuMimoSoundingSeq = new Sequence([hybridAnnoucementSeq,hybridSoundingSeq,suFeedbackSeq], 60, "Hybrid beamforming protocol for SU-MIMO");
 
 if (1) {
@@ -453,4 +454,10 @@ if (1) {
 
 </body>
 </html>
+
+
+
+
+
+
 
