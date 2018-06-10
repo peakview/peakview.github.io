@@ -93,7 +93,7 @@ function WrapText(textElement, width) {
     //textElement.textContent="a"+txtLineNew;
       if (txtLineNew.length>NcharPerLine) {
         if (txtLineOld.length == 0) {
-          txtLine = txtLineNew;
+          txtLine = txts[iiWord];
           txtLineOld = "";
         }
         else {
@@ -373,10 +373,10 @@ var edmgBFTSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,s
 var edmgabftSeq = new Sequence([edmgsswslotSeq,edmgsswslotSeq,edmgsswslotSeq], 60, "A-BFT");
 if (1){
   svgID="fig1";
-seqInfo = dmgbtiSeq.plot(svgID,20,90);
-dmgabftSeq.plot(svgID,seqInfo.x_end,90);
-seqInfo = edmgbtiSeq.plot(svgID,20,290);
-edmgabftSeq.plot(svgID,seqInfo.x_end,290);
+seqInfo = dmgbtiSeq.plot(svgID,20,110);
+dmgabftSeq.plot(svgID,seqInfo.x_end,110);
+seqInfo = edmgbtiSeq.plot(svgID,20,310);
+edmgabftSeq.plot(svgID,seqInfo.x_end,310);
   
   
 svgID="fig2";
