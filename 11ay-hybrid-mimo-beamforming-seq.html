@@ -201,7 +201,8 @@ var mimoBfFbFrame = new Frame("MIMO BF Feedback", 80);
 var muMimoBfSelectionFrame = new Frame("MU-MIMO BF Selection", 80);
   
 var rtsFrame = new DMGFrame("RTS", 40, "Ctrl-Trailer", 1);
-var ctsFrame = new DMGFrame("CTS", 40, "Ctrl-Trailer", 1);
+var ctscFrame = new DMGFrame("CTS", 40, "Ctrl-Trailer", 1);
+var ctsFrame = new Frame("CTS", 40);
   
 function Slot(fName, fWidth) {
     Frame.call(this, fName, fWidth);   
@@ -454,10 +455,4 @@ if (1) {
 
 </body>
 </html>
-
-
-
-
-
-
 
