@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>11ay Hybrid Beamforming Protocol</h2>
+
+<h3>SU-MIMO Hybrid Beamforming Training</h3>
+<p> EDMG AP or PCP transmits a sequence of DMG Beacon, then EDMG non-AP STAs will access in A-BFT.</p>
+
+<p>Features: 1, Use RTS/CTS to indicate one of pre-configured MIMO setups being used in incoming sounding transmission; 
+  2, Either initiator souding or Initiator+Responder suonding as negotiated in announcement phase.</p>
+<svg width="1200" height="300" id="fig1">
+  <defs>
+    <!-- arrowhead marker definition -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+        markerWidth="6" markerHeight="6"
+        orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+
+    <!-- simple dot marker definition -->
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5"
+        markerWidth="5" markerHeight="5">
+      <circle cx="5" cy="5" r="5" fill="red" />
+    </marker>
+  </defs>
+  Sorry, your browser does not support inline SVG.  
+</svg>
+
+<p> Frame sequence = </p>
+<p id="demo">a</p>
+<p id="dbg1">dbg info:</p>
+
+<h3>MU-MIMO Hybrid Beamforming Training</h3>
+  <h4>Initiator (EDMG AP) transmits BRP frame with TRN fields as reference signal for sounding</h4>
+<p>Features: 1, CIR feedback; 2, CFR feedback with Givens method; 2.1 CFR feedback with Dynamic subcarrier spacing (Optional) </p>
+<svg width="1200" height="400" id="fig2">
+  <defs>
+    <!-- arrowhead marker definition -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+        markerWidth="6" markerHeight="6"
+        orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+
+    <!-- simple dot marker definition -->
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5"
+        markerWidth="5" markerHeight="5">
+      <circle cx="5" cy="5" r="5" fill="red" />
+    </marker>
+  </defs>
+  Sorry, your browser does not support inline SVG.  
+</svg>
+
+
+<p id="dbg">b</p>
+
+<script>
+function SeqInfo(x_end, layerID) {
+    this.x_end = x_end;
+    this.layerID = layerID;
+}
+function Frame(fName, fWidth) {
+    this.name = fName;
+    this.width = fWidth;
+    this.height = 30;
+}
+Frame.prototype.plot = function(svgID,x,y,dashed=0) {
+    var rectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rectElement.setAttribute("fill", "#86aeef");
+    rectElement.setAttribute("x", x);
+    rectElement.setAttribute("y", y);
+    rectElement.setAttribute('stroke','#000');
+    rectElement.setAttribute('stroke-width','1');
+    rectElement.setAttribute("width", this.width);
+    rectElement.setAttribute("height", this.height);
+    if (dashed>0) {
+        rectElement.setAttribute("stroke-dasharray","5,10");
+    }
+    var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textElement.setAttribute("x", x + this.width/2-30);
+    textElement.setAttribute("y", y + this.height/2+5);
+    //textElement.setAttribute("x", "50%");
+    //textElement.setAttribute("y", "50%");
+    //textElement.setAttribute("alignment-baseline","middle");
+    textElement.textContent = this.name;
+    document.getElementById(svgID).appendChild(rectElement);
+    document.getElementById(svgID).appendChild(textElement);
+    
+    return new SeqInfo(x + this.width, 0);
+};
+function DMGFrame(fName, fWidth, tailName, nRepeat) {
+    Frame.call(this, fName, fWidth);
+    
+    this.tailName = tailName;
+    this.nRepeat = nRepeat;
+}
+DMGFrame.prototype.plotTail = function(svgID, x, y) {
+    var TRNwidth = 16;
+    var rectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rectElement.setAttribute("fill", "#86aeef");
+    rectElement.setAttribute("x", x);
+    rectElement.setAttribute("y", y);
+    rectElement.setAttribute('stroke','#000');
+    rectElement.setAttribute('stroke-width','1');
+    rectElement.setAttribute("width", TRNwidth);
+    rectElement.setAttribute("height", this.height);
+    var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    x_tmp=x + 14;
+    y_tmp = y + this.height/2+25;
+    textElement.setAttribute("x", x_tmp);
+    textElement.setAttribute("y", y_tmp);
+    textElement.setAttribute("transform", "rotate(-90,"+(x_tmp)+"," + (y_tmp)+")");
+    //textElement.setAttribute("x", "50%");
+    //textElement.setAttribute("y", "50%");
+    //textElement.setAttribute("alignment-baseline","middle");
+    textElement.textContent = this.tailName;
+    document.getElementById(svgID).appendChild(rectElement);
+    document.getElementById(svgID).appendChild(textElement);
+    
+    return new SeqInfo(x + TRNwidth, 0);
+}
+DMGFrame.prototype.plot = function(svgID, x, y) {
+    seqInfo=Frame.prototype.plot.call(this, svgID, x, y);
+    var i_x=seqInfo.x_end;
+    var iiTail=0;
+    for (iiTail = 0; iiTail < this.nRepeat; iiTail++) {
+        seqInfo=this.plotTail(svgID, i_x, y);
+        i_x=seqInfo.x_end;
+    }
+    //i_x=x + this.width;
+    return new SeqInfo(i_x, 0);
+};
+var bcnFrame = new Frame("Beacon", 100);
+var sSSWFrame = new Frame("sSSW", 60);
+var sswfbFrame = new Frame("SSW-FB", 60);
+var sswackFrame = new Frame("SSW-ack", 60);
+var dmgbcnFrame = new DMGFrame("Beacon", 100, "TRN-R", 2);
+  
+  
+var brpReqFrame = new Frame("BRP", 100);
+var edmgBrpReqFrame = new Frame("BRP-REQ", 100);
+var mimoBfSetupFrame = new Frame("MIMO BF Setup", 100);
+var edmgBrpTxFrame = new DMGFrame("BRP-TX", 80, "TRN-T", 2);
+var edmgBrpFBFrame = new Frame("BRP-FB", 100);
+  
+var mimoBfPollFrame = new Frame("MIMO BF Poll", 60);
+var mimoBfFbFrame = new Frame("MIMO BF Feedback", 80);
+var muMimoBfSelectionFrame = new Frame("MU-MIMO BF Selection", 80);
+  
+var rtsFrame = new DMGFrame("RTS", 40, "Ctrl-Trailer", 1);
+var ctsFrame = new DMGFrame("CTS", 40, "Ctrl-Trailer", 1);
+  
+function Slot(fName, fWidth) {
+    Frame.call(this, fName, fWidth);   
+}
+Slot.prototype.plot = function(svgID, x, y) {
+    seqInfo=Frame.prototype.plot.call(this, svgID, x, y, 1);
+    return seqInfo;
+};
+var sswSlot = new Slot("SSW", 66);
+var s_sswSlot = new Slot("sSSW", 39);
+function IFS(ifsName,fWidth) {
+    this.name = ifsName;
+    this.width = fWidth;
+    this.height = 0;
+}
+IFS.prototype.plot = function(svgID,x,y) {
+    var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textElement.setAttribute("x", x + this.width/4-20);
+    textElement.setAttribute("y", y - 10);
+    textElement.textContent = this.name;
+    document.getElementById(svgID).appendChild(textElement);
+    return new SeqInfo(x + this.width, 0);
+}
+var sIFS = new IFS("SIFS", 20);
+var sbIFS = new IFS("SBIFS", 10);
+var mbIFS = new IFS("MBIFS", 20);
+  
+var brpIFS = new IFS("BRPIFS", 20);
+  
+  
+function Sequence(seq,fHeight,seqName="") {
+    this.seq = seq;
+    this.height = fHeight;
+    this.name = seqName;
+    this.laneHeight = 100;
+    this.x_end = 0;
+}
+Sequence.prototype.plot = function(svgID,x,y,lanes=0) {
+    var seqInfo;
+	this.x_end = x;
+    var i_y;
+    var layerID=0;
+    var y_space_layer=30;
+    for (var i = 0; i < this.seq.length; i++) { 
+        this.seq[i].height = this.height;
+        if (lanes.constructor === Array) {
+          if (lanes.length>i){
+            i_lanes=lanes[i];
+          }
+          else {
+            i_lanes=0;
+          }
+          if (i_lanes.constructor === Array) {
+            seqInfo = this.seq[i].plot(svgID,this.x_end,y,i_lanes);
+          }
+          else {
+            i_y = y+this.laneHeight*i_lanes;
+            seqInfo = this.seq[i].plot(svgID,this.x_end,i_y);
+          }
+        }
+        else {
+          i_y = y+this.laneHeight*lanes;
+          i_lanes=0;
+          seqInfo = this.seq[i].plot(svgID,this.x_end,i_y);
+        }
+        this.x_end = seqInfo.x_end;
+        if (layerID < seqInfo.layerID) {
+            layerID = seqInfo.layerID;
+        }
+        //document.getElementById("dbg1").innerHTML = document.getElementById("dbg1").innerHTML + ">>"+ this.seq[i].name + "-"+i_lanes;
+    }
+    if (this.name.length >0) {
+    var lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineElement.setAttribute("x1", x);
+    lineElement.setAttribute("y1", y - y_space_layer*(layerID+1));
+    lineElement.setAttribute("x2", this.x_end);
+    lineElement.setAttribute("y2", y - y_space_layer*(layerID+1));
+    lineElement.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
+    lineElement.setAttribute("marker-start","url(#arrow)");
+    lineElement.setAttribute("marker-end","url(#arrow)");
+    var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textElement.setAttribute("x", (x + this.x_end)/2);
+    textElement.setAttribute("y", y - y_space_layer*(layerID+1) - 5);
+    textElement.textContent = this.name;//+"("+this.seq.length;
+    document.getElementById(svgID).appendChild(lineElement);
+    document.getElementById(svgID).appendChild(textElement);
+    }
+    return new SeqInfo(this.x_end, layerID+1);
+}
+Sequence.prototype.printName = function() {
+    var i;
+    //var aa=[1,2];1;//(aa.constructor === Array)+
+    //var aa=[1,[2,3]];
+    text = this.name + " sequence = ";
+    for (i = 0; i < this.seq.length; i++) { 
+        text += this.seq[i].name;
+        if (i < this.seq.length - 1) { 
+            text += "+";
+        }
+    }
+    return text;
+};
+  
+  
+Sequence.prototype.multiLanes = function(svgID, x, y, LaneNames=[""]) {
+  document.getElementById("dbg1").innerHTML = document.getElementById("dbg1").innerHTML + ">>"+ LaneNames + "-";
+  for (var i = 0; i < LaneNames.length; i++) { 
+    var lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    lineElement.setAttribute("x1", x-10);
+    lineElement.setAttribute("y1", y +this.height + this.laneHeight*i);
+    lineElement.setAttribute("x2", this.x_end+30);
+    lineElement.setAttribute("y2", y +this.height + this.laneHeight*i);
+    lineElement.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
+    //lineElement.setAttribute("marker-start","url(#arrow)");
+    lineElement.setAttribute("marker-end","url(#arrow)");
+    
+    var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textElement.setAttribute("x", x -50);
+    textElement.setAttribute("y", y +this.height + this.laneHeight*i);
+    textElement.textContent = LaneNames[i];//+"("+this.seq.length;
+    document.getElementById(svgID).appendChild(lineElement);
+    document.getElementById(svgID).appendChild(textElement);
+  }
+}
+  
+  
+var dmgbtiSeq = new Sequence([bcnFrame,sbIFS,bcnFrame,sbIFS,bcnFrame,sbIFS,bcnFrame,sbIFS,bcnFrame,sbIFS,bcnFrame,mbIFS], 60, "BTI");
+var dmgsswslotSeq = new Sequence([sswSlot,sbIFS,sswSlot,mbIFS,sswfbFrame,mbIFS], 60, "SSW slot");
+var dmgabftSeq = new Sequence([dmgsswslotSeq,dmgsswslotSeq], 60, "A-BFT");
+document.getElementById("demo").innerHTML = dmgbtiSeq.printName();
+
+
+var edmgbtiSeq = new Sequence([dmgbcnFrame,sbIFS,dmgbcnFrame,sbIFS,dmgbcnFrame,mbIFS], 60, "BTI");
+var edmgsswslotSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,sswfbFrame,mbIFS], 60, "SSW slot");
+var edmgUnsolicitedRSSSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,sswfbFrame,sIFS,sswackFrame], 60, "UnsolicitedRSS");
+var edmgBFTSeq = new Sequence([s_sswSlot,sbIFS,s_sswSlot,sbIFS,s_sswSlot,mbIFS,sswfbFrame], 60, "BFT");
+var edmgabftSeq = new Sequence([edmgsswslotSeq,edmgsswslotSeq,edmgsswslotSeq], 60, "A-BFT");
+
+if (0){
+  svgID="demo2";
+seqInfo = dmgbtiSeq.plot(svgID,20,90);
+dmgabftSeq.plot(svgID,seqInfo.x_end,90);
+seqInfo = edmgbtiSeq.plot(svgID,20,290);
+edmgabftSeq.plot(svgID,seqInfo.x_end,290);
+  }
+  
+  
+var suSisoSetupSeq = new Sequence([edmgBrpReqFrame,mbIFS,edmgBrpReqFrame,mbIFS], 60, "Setup Phase");
+var suInitiatorBrpTxssSeq = new Sequence([edmgBrpTxFrame,brpIFS,edmgBrpTxFrame,mbIFS], 60, "Initiator TXSS Phase");
+var suResponderBrpTxssSeq = new Sequence([edmgBrpTxFrame,brpIFS,edmgBrpTxFrame,mbIFS], 60, "Responder TXSS Phase");
+var suFeedbackSeq = new Sequence([edmgBrpFBFrame,sIFS,edmgBrpFBFrame], 60, "Feedback Phase");
+  suSisoFeedbackSeq = suFeedbackSeq;
+var suMimoBrpTxssSeq = new Sequence([suSisoSetupSeq,suInitiatorBrpTxssSeq,suResponderBrpTxssSeq,suFeedbackSeq], 60, "MIMO BRP TXSS Procedure");
+var suMimoSisoPhaseSeq = new Sequence([suMimoBrpTxssSeq], 60, "SU-MIMO SISO Phase");
+if (0) {
+  svgID="demo2";
+  seqInfo = suMimoSisoPhaseSeq.plot(svgID,20,120);
+}
+var suMimoSisoPhaseSeq = new Sequence([suSisoFeedbackSeq], 60, "SU-MIMO SISO Phase");
+if (0) {
+  svgID="demo2";
+  seqInfo = suMimoSisoPhaseSeq.plot(svgID,20,290);
+}
+
+  
+var suMimoSetupSeq = new Sequence([mimoBfSetupFrame,sIFS,mimoBfSetupFrame,mbIFS], 60, "Setup Subphase");
+var suMimoInitiatorSmbtSeq = new Sequence([edmgBrpTxFrame,sIFS,edmgBrpTxFrame,mbIFS], 60, "Initiator SMBT Subphase");
+var suMimoResponderSmbtSeq = new Sequence([edmgBrpTxFrame,sIFS,edmgBrpTxFrame,mbIFS], 60, "Responder SMBT Subphase");
+var suNonReciprocalMimoFeedbackSeq = new Sequence([edmgBrpFBFrame,sIFS,edmgBrpFBFrame], 60, "Feedback Subphase");
+var suNonReciprocalMIMOPhaseSeq = new Sequence([suMimoSetupSeq,suMimoInitiatorSmbtSeq,suMimoResponderSmbtSeq,suNonReciprocalMimoFeedbackSeq], 60, "SU Non-reciprocal MIMO Phase");
+if (0) {
+  svgID="demo3";
+  seqInfo = suNonReciprocalMIMOPhaseSeq.plot(svgID,20,120);
+}
+if (0){
+  svgID="demo3";
+  seqInfo = dmgbtiSeq.plot(svgID,20,90);
+  edmgUnsolicitedRSSSeq.plot(svgID,seqInfo.x_end,90);
+}
+  
+var suReciprocalMimoFeedbackSeq = new Sequence([edmgBrpFBFrame], 60, "Feedback Subphase");
+var suReciprocalMIMOPhaseSeq = new Sequence([suMimoSetupSeq,suMimoInitiatorSmbtSeq,suReciprocalMimoFeedbackSeq], 60, "SU Non-reciprocal MIMO Phase");
+if (0) {
+  svgID="fig3";
+  seqInfo = suReciprocalMIMOPhaseSeq.plot(svgID,20,120);
+}
+svgID="fig3";
+  if (0){
+seqInfo = dmgbtiSeq.plot(svgID,20,90);
+edmgBFTSeq.plot(svgID,seqInfo.x_end,90);
+  }
+  
+var issSeq = new Sequence([sSSWFrame,sbIFS,sSSWFrame,sbIFS,sSSWFrame,mbIFS], 60, "Initiator TXSS Subphase");
+var muSisoFbSeq = new Sequence([brpReqFrame,sIFS,brpReqFrame,sIFS,brpReqFrame,sIFS,brpReqFrame], 60, "Initiator TXSS Subphase");
+var muMimoSisoPhaseSeq = new Sequence([issSeq,muSisoFbSeq], 60, "MU-MIMO SISO Phase");
+if (0) {
+  svgID="fig1";
+  seqInfo = muMimoSisoPhaseSeq.plot(svgID,50,120,[[0,0,0,0,0,0],[0,0,1,0,0,0,2]]);
+  muMimoSisoPhaseSeq.multiLanes(svgID, 50,120, ["AP","STA1","STA2"]);
+}
+
+var muMimoBfTrainingSeq=suMimoInitiatorSmbtSeq;
+muMimoBfTrainingSeq.name = "MU-MIMO BF Training Subphase";
+var muFeedbackSeq = new Sequence([mimoBfPollFrame,sIFS,mimoBfFbFrame,sIFS,mimoBfPollFrame,sIFS,mimoBfFbFrame,mbIFS], 60, "Feedback Subphase");
+var muMimoBfSelectionSeq = new Sequence([muMimoBfSelectionFrame,sIFS,muMimoBfSelectionFrame], 60, "MU-MIMO BF Selection Subphase");
+var muNonReciprocalMIMOPhaseSeq = new Sequence([suMimoSetupSeq,muMimoBfTrainingSeq,muFeedbackSeq,muMimoBfSelectionSeq], 60, "MU Non-reciprocal MIMO Phase");
+
+if (0) {
+  svgID="fig2";
+  //seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[0,0,0,0,0,0],[0,0,1,0,0,0,2]]);
+  seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[],[],[0,0,1,0,0,0,2,0],[]]);
+  muNonReciprocalMIMOPhaseSeq.multiLanes(svgID, 50,120, ["AP","STA1","STA2"]);
+}  
+  
+var muNonReciprocalMimoBfTrainingSeq = new Sequence([mimoBfPollFrame,sIFS,edmgBrpTxFrame,sIFS,edmgBrpTxFrame,sIFS,mimoBfPollFrame,sIFS,edmgBrpTxFrame,sIFS,edmgBrpTxFrame,mbIFS], 60, "MU-MIMO BF training Subphase");
+var muNonReciprocalMIMOPhaseSeq = new Sequence([suMimoSetupSeq,muNonReciprocalMimoBfTrainingSeq,muMimoBfSelectionSeq], 60, "MU Non-reciprocal MIMO Phase");
+
+if (0) {
+  svgID="fig3";
+  //seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[0,0,0,0,0,0],[0,0,1,0,0,0,2]]);
+  seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[],[0,0,1,0,1,0,0,0,2,0,2,0],[]]);
+  muNonReciprocalMIMOPhaseSeq.multiLanes(svgID, 50,120, ["AP","STA1","STA2"]);
+}
+  
+  
+var hybridAnnoucementSeq = new Sequence([rtsFrame,sIFS,ctsFrame,sIFS], 60, "Announcement phase");
+var hybridSoundingSeq = new Sequence([edmgBrpTxFrame,sIFS], 60, "Sounding phase");
+var hybridMuMimoSoundingSeq = new Sequence([hybridAnnoucementSeq,hybridSoundingSeq,muFeedbackSeq], 60, "Hybrid beamforming protocol for MU-MIMO");
+
+if (1) {
+  svgID="fig2";
+  //seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[0,0,0,0,0,0],[0,0,1,0,0,0,2]]);
+  seqInfo = hybridMuMimoSoundingSeq.plot(svgID,50,120,[[0,0,1,0],[],[0,0,1,0,0,0,2,0]]);
+  hybridMuMimoSoundingSeq.multiLanes(svgID, 50,120, ["AP","STA1","STA2"]);
+}
+  
+var suFeedbackSeq = new Sequence([mimoBfFbFrame], 60, "Feedback Subphase");
+var hybridSuMimoSoundingSeq = new Sequence([hybridAnnoucementSeq,hybridSoundingSeq,suFeedbackSeq], 60, "Hybrid beamforming protocol for SU-MIMO");
+
+if (1) {
+  svgID="fig1";
+  //seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[0,0,0,0,0,0],[0,0,1,0,0,0,2]]);
+  seqInfo = hybridSuMimoSoundingSeq.plot(svgID,50,120,[[0,0,1,0],[],[1]]);
+  hybridSuMimoSoundingSeq.multiLanes(svgID, 50,120, ["AP","STA"]);
+}
+</script>
+
+</body>
+</html>
