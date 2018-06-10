@@ -70,13 +70,39 @@ function WrapText(textElement, width) {
     var NcharPerLine = Math.ceil(txt.length /textElement.getBBox().width * width);
     var Nline_predict = Math.ceil(textElement.getBBox().width / width);
     textElement.textContent = "";
+    txtLineOld = "";
+    var iiLine = 0;
     for (var iiWord = 0; iiWord < txts.length ; iiWord++) {
-      tspan = document.createElementNS("http://www.w3.org/2000/svg", 'tspan');
-      tspan.textContent = txts[iiWord];
-    tspan.setAttribute("x", x);
-    tspan.setAttribute("y", parseFloat(y)+15*(iiWord-Nline_predict/2));
-      textElement.appendChild(tspan);
+      txtLineNew = txtLineOld + " " +txts[iiWord];
+    //textElement.textContent="a"+txtLineNew;
+      if (txtLineNew.length>NcharPerLine) {
+        if (txtLineOld.length == 0) {
+          txtLine = txtLineNew;
+          txtLineOld = "";
+        }
+        else {
+          txtLine = txtLineOld;
+          txtLineOld = txts[iiWord];
+        }
+        tspan = document.createElementNS("http://www.w3.org/2000/svg", 'tspan');
+        tspan.textContent = txtLine;
+        tspan.setAttribute("x", x);
+        tspan.setAttribute("y", parseFloat(y)+7+15*(iiLine-Nline_predict/2));
+        textElement.appendChild(tspan);
+        iiLine++;
+      } else {
+      txtLineOld=txtLineOld + " " +txts[iiWord];
+      }
     }
+    if (txtLineOld.length > 0) {
+      tspan = document.createElementNS("http://www.w3.org/2000/svg", 'tspan');
+      tspan.textContent = txtLineOld;
+      tspan.setAttribute("x", x);
+      tspan.setAttribute("y", parseFloat(y)+7+15*(iiLine-Nline_predict/2));
+      textElement.appendChild(tspan);
+      iiLine++;
+    }
+    return iiLine;
   }
   else {
     return 1;
@@ -427,10 +453,4 @@ if (1) {
 
 </body>
 </html>
-
-
-
-
-
-
 
