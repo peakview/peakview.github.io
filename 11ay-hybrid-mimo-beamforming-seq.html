@@ -60,6 +60,28 @@ function SeqInfo(x_end, layerID) {
     this.x_end = x_end;
     this.layerID = layerID;
 }
+  
+function WrapText(textElement, width) {
+  if (textElement.getBBox().width > width) {
+    var y = textElement.getAttribute("y");
+    var x = textElement.getAttribute("x");
+    txt = textElement.textContent;
+    txts = txt.split(" ");
+    var NcharPerLine = Math.ceil(txt.length /textElement.getBBox().width * width);
+    var Nline_predict = Math.ceil(textElement.getBBox().width / width);
+    textElement.textContent = "";
+    for (var iiWord = 0; iiWord < txts.length ; iiWord++) {
+      tspan = document.createElementNS("http://www.w3.org/2000/svg", 'tspan');
+      tspan.textContent = txts[iiWord];
+    tspan.setAttribute("x", x);
+    tspan.setAttribute("y", parseFloat(y)+15*(iiWord-Nline_predict/2));
+      textElement.appendChild(tspan);
+    }
+  }
+  else {
+    return 1;
+  }
+}
 function Frame(fName, fWidth) {
     this.name = fName;
     this.width = fWidth;
@@ -78,15 +100,19 @@ Frame.prototype.plot = function(svgID,x,y,dashed=0) {
         rectElement.setAttribute("stroke-dasharray","5,10");
     }
     var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    textElement.setAttribute("x", x + this.width/2-30);
+    textElement.setAttribute("x", x + this.width/2);
     textElement.setAttribute("y", y + this.height/2+5);
     //textElement.setAttribute("x", "50%");
-    //textElement.setAttribute("y", "50%");
-    //textElement.setAttribute("alignment-baseline","middle");
+    //textElement.setAttribute("y", "50%");="middle"
+    textElement.setAttribute("text-anchor","middle");
     textElement.textContent = this.name;
+    
     document.getElementById(svgID).appendChild(rectElement);
     document.getElementById(svgID).appendChild(textElement);
-    
+  
+    document.getElementById("dbg1").innerHTML = document.getElementById("dbg1").innerHTML + ">>"+ textElement.getBBox().width;
+    WrapText(textElement, this.width);
+
     return new SeqInfo(x + this.width, 0);
 };
 function DMGFrame(fName, fWidth, tailName, nRepeat) {
@@ -167,8 +193,9 @@ function IFS(ifsName,fWidth) {
 }
 IFS.prototype.plot = function(svgID,x,y) {
     var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    textElement.setAttribute("x", x + this.width/4-20);
+    textElement.setAttribute("x", x + this.width/2);
     textElement.setAttribute("y", y - 10);
+    textElement.setAttribute("text-anchor","middle");
     textElement.textContent = this.name;
     document.getElementById(svgID).appendChild(textElement);
     return new SeqInfo(x + this.width, 0);
@@ -231,8 +258,9 @@ Sequence.prototype.plot = function(svgID,x,y,lanes=0) {
     lineElement.setAttribute("marker-start","url(#arrow)");
     lineElement.setAttribute("marker-end","url(#arrow)");
     var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    textElement.setAttribute("x", (x + this.x_end)/2);
+    textElement.setAttribute("x", (x + this.x_end)/2);//
     textElement.setAttribute("y", y - y_space_layer*(layerID+1) - 5);
+    textElement.setAttribute("text-anchor", "middle");
     textElement.textContent = this.name;//+"("+this.seq.length;
     document.getElementById(svgID).appendChild(lineElement);
     document.getElementById(svgID).appendChild(textElement);
@@ -253,7 +281,7 @@ Sequence.prototype.printName = function() {
     return text;
 };
   
-  
+// plot multiple x-axis (time axles)
 Sequence.prototype.multiLanes = function(svgID, x, y, LaneNames=[""]) {
   document.getElementById("dbg1").innerHTML = document.getElementById("dbg1").innerHTML + ">>"+ LaneNames + "-";
   for (var i = 0; i < LaneNames.length; i++) { 
@@ -399,3 +427,10 @@ if (1) {
 
 </body>
 </html>
+
+
+
+
+
+
+
