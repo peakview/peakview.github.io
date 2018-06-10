@@ -456,7 +456,7 @@ if (1) {
 }  
   
 var muNonReciprocalMimoBfTrainingSeq = new Sequence([mimoBfPollFrame,sIFS,edmgBrpTxFrame,sIFS,edmgBrpTxFrame,sIFS,mimoBfPollFrame,sIFS,edmgBrpTxFrame,sIFS,edmgBrpTxFrame,mbIFS], 60, "MU-MIMO BF training Subphase");
-var muNonReciprocalMIMOPhaseSeq = new Sequence([suMimoSetupSeq,muNonReciprocalMimoBfTrainingSeq,muMimoBfSelectionSeq], 60, "MU Non-reciprocal MIMO Phase");
+var muNonReciprocalMIMOPhaseSeq = new Sequence([suMimoSetupSeq,muNonReciprocalMimoBfTrainingSeq,muMimoBfSelectionSeq], 60, "MU Reciprocal MIMO Phase");
 if (1) {
   svgID="fig3";
   //seqInfo = muNonReciprocalMIMOPhaseSeq.plot(svgID,50,120,[[0,0,0,0,0,0],[0,0,1,0,0,0,2]]);
