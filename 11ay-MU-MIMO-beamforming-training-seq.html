@@ -436,7 +436,7 @@ edmgBFTSeq.plot(svgID,seqInfo.x_end,90);
   }
   
 var issSeq = new Sequence([sSSWFrame,sbIFS,sSSWFrame,sbIFS,sSSWFrame,mbIFS], 60, "Initiator TXSS Subphase");
-var muSisoFbSeq = new Sequence([brpReqFrame,sIFS,brpReqFrame,sIFS,brpReqFrame,sIFS,brpReqFrame], 60, "Initiator TXSS Subphase");
+var muSisoFbSeq = new Sequence([brpReqFrame,sIFS,brpReqFrame,sIFS,brpReqFrame,sIFS,brpReqFrame], 60, "SISO Feedback Subphase");
 var muMimoSisoPhaseSeq = new Sequence([issSeq,muSisoFbSeq], 60, "MU-MIMO SISO Phase");
 if (1) {
   svgID="fig1";
